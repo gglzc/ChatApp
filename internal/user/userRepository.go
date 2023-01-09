@@ -13,6 +13,10 @@ type DBTX interface{
 	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
 }
 
+type RDBTX interface{
+	
+}
+
 type repository struct{
 	db DBTX
 }
@@ -23,7 +27,7 @@ func NewRepository(db DBTX) Repository{
 
 func (r *repository) CreateUser(ctx context.Context,user *User)(*User , error ){
 	var lastInsertID int
-	//放入前檢查完畢,插入資料庫
+	//放入db前先檢查完畢確認沒有,插入資料庫
 	query := "INSERT INTO public.user(username, password, email) VALUES ($1, $2, $3) returning id"
 	err := r.db.QueryRowContext(ctx , query, user.Username,user.Password,user.Email).Scan(&lastInsertID)
 	if err!=nil{
