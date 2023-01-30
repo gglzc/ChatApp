@@ -14,6 +14,8 @@ func main(){
 	if err!=nil{
 		log.Fatalf("can't connect db cause : %s" ,err)
 	}
+	
+	
 	userRep := user.NewRepository(dbConn.GetDB())
 	userSvc := user.NewService(userRep)
 	userHandler := user.NewHandler(userSvc)

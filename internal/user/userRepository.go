@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-
+	"github.com/go-redis/redis/v9"
 )
 type DBTX interface{
 	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
@@ -13,20 +13,26 @@ type DBTX interface{
 	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
 }
 
-type RDBTX interface{
-	
+type ChacheTx interface{
+    Get(ctx context.Context, key string) (*redis.MapStringIntCmd , error)
+    Set(ctx context.Context, key string, value string) (*redis.Cmder , error)
 }
 
 type repository struct{
 	db DBTX
+	redisdb	ChacheTx
 }
 
-func NewRepository(db DBTX) Repository{
-	return &repository{db: db}
+func NewRepository(db DBTX ) Repository{
+	return &repository{
+		db:      db,
+	
+	}
 }
 
 func (r *repository) CreateUser(ctx context.Context,user *User)(*User , error ){
 	var lastInsertID int
+	//先到快取尋找有沒有存在
 	//放入db前先檢查完畢確認沒有,插入資料庫
 	query := "INSERT INTO public.user(username, password, email) VALUES ($1, $2, $3) returning id"
 	err := r.db.QueryRowContext(ctx , query, user.Username,user.Password,user.Email).Scan(&lastInsertID)
@@ -81,3 +87,14 @@ func (r *repository)CheckEmailExist(ctx context.Context , email string)(bool,err
 	return true,nil
 }
 
+/*
+func (r *repository)ChacheGet(ctx context.Context, token string) (*redis.Cmd ,error){
+	getuser,err:=r.redisdb.Get(ctx , token)
+	if err!=nil{
+		return nil,err
+	}
+
+	return getuser , nil
+
+}
+*/

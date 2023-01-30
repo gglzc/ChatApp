@@ -3,7 +3,9 @@ package user
 import (
 	"net/http"
 
+
 	"github.com/gin-gonic/gin"
+
 )
 
 type Handler struct{
@@ -50,7 +52,37 @@ func (h *Handler)Login(c *gin.Context){
 	c.JSON(http.StatusOK , u)
 }
 //for Service
+
 func (h *Handler) LogOut(c *gin.Context){
 		c.SetCookie("jwt","",-1,"","",false,true)
 		c.JSON(http.StatusOK , gin.H{"message" : "log out successful"})
+}
+
+//for getUserInfo
+/**
+func (h *Handler) GetUserJwt(c *gin.Context) {
+	cookie , err := c.Cookie("jwt")
+	if err!=nil{
+		c.JSON(http.StatusBadRequest,err)
+		return
 	}
+	
+	token , err := jwt.ParseWithClaims(cookie , &jwt.StandardClaims{} , func(*jwt.Token) (interface{} ,error){
+		return []byte(secretKey),nil
+	})
+	if err!=nil{
+		c.JSON(http.StatusInternalServerError,err)
+		return
+	}
+
+	claims :=token.Claims.(*jwt.StandardClaims)
+	
+	issuer , err := strconv.ParseInt(claims.Issuer,10,64)
+	if err!=nil{
+		c.JSON(http.StatusInternalServerError,err)
+		return
+	}
+
+	result , err := h.Service.
+
+}**/

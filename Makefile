@@ -10,6 +10,9 @@ createdb:
 dropdb:
 	docker exec -it postgresforChat dropdb  go-chat
 
+createRedisdb:
+	docker exec -it redisChat createdb --username=root  --owner=root go-chat
+
 migrateup:
 	migrate -path db/migrations -database "postgres://root:test@localhost:5430/go-chat?sslmode=disable" --verbose up
 

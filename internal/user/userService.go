@@ -2,16 +2,16 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
-	"fmt"
 
 	"github.com/gglzc/StreamingWeb/util"
 	"github.com/golang-jwt/jwt/v4"
 )
 
 const(
-	secretKey = "fkwthewsorwld"
+	secretKey = "fkwthewsorwlxd"
 )
 
 type service struct{
@@ -118,4 +118,8 @@ func (s *service) CheckUsernameAndEmailExist(ctx context.Context, username, emai
     }
 
     return nil
+}
+
+func (s *service) GetChache(ctx context.Context , jwt string) error {
+	return nil
 }

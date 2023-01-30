@@ -25,41 +25,50 @@ func NewHub() *Hub{
 func (h *Hub) Run() {
 	for {
 		select{
-		case cl:=<-h.Register:
+		case client :=<- h.Register:
 			//the room exist
-			if _ , ok := h.Rooms[cl.RoomID]; ok{
-			  	 r:=h.Rooms[cl.RoomID]
+			if _ , isRoomExist := h.Rooms[client.RoomID]; isRoomExist{
 
 				 //the client if  is already  exist or not 
 				 //if doesn't exist then add client to the room
-				 if _,ok := r.Clients[cl.ID]; !ok{
-					r.Clients[r.ID] = cl
+				 room := h.Rooms[client.RoomID]
+				 
+				 if _,isClientExist := room.Clients[client.ID]; !isClientExist{
+					room.Clients[client.ID] = client
 				 }
 			}
-		case cl:=<-h.UnRegister:
+			
+		case client := <-h.UnRegister:
 			//check the roomId exist
-			if _,ok :=  h.Rooms[cl.RoomID] ; ok{
+			if _,ok :=  h.Rooms[client.RoomID] ; ok{
 				//if the client actually exists
-				if _,ok:= h.Rooms[cl.RoomID].Clients[cl.ID] ; ok{
+				if _,ok:= h.Rooms[client.RoomID].Clients[client.ID] ; ok{
 					//broadcast that the client has left the room
-					if len(h.Rooms[cl.RoomID].Clients)!=0{
+					if len(h.Rooms[client.RoomID].Clients)!=0{
 						h.Broadcast <- &Message{
 							Content:  "user left the chat",
-							RoomID:   cl.RoomID,
-							Username: cl.Username,
+							RoomID:   client.RoomID,
+							Username: client.Username,
 						}
 					}
 					//client leave the room
-					delete(h.Rooms[cl.RoomID].Clients , cl.ID)
-					close(cl.Message)
+					delete(h.Rooms[client.RoomID].Clients , client.ID)
+					close(client.Message)
+				}
+				//if the room dosen't exist then delete the room
+				clients := h.Rooms[client.RoomID].Clients
+				if len(clients) == 0 {
+					delete(h.Rooms, client.RoomID)
 				}
 			} 
-		case m := <-h.Broadcast: 
+		case message := <-h.Broadcast: 
 			//check the the exist or not
-			if _ , ok :=  h.Rooms[m.RoomID] ; ok{
+			if _ , ok :=  h.Rooms[message.RoomID] ; ok{
 				//sending the message to all the client in the room
-				for _ , cl := range h.Rooms[m.RoomID].Clients{
-					cl.Message<- m 
+				for _ , client := range h.Rooms[message.RoomID].Clients{
+					
+					client.Message<- message
+					
 				}
 			}
 		}
