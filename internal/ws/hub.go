@@ -18,7 +18,7 @@ func NewHub() *Hub{
 		Rooms:      make(map[string]*Room),
 		Register:   make(chan *Client),
 		UnRegister: make(chan *Client),
-		Broadcast:  make(chan *Message , 5),
+		Broadcast:  make(chan *Message),
 	}
 }
 
@@ -61,14 +61,14 @@ func (h *Hub) Run() {
 					delete(h.Rooms, client.RoomID)
 				}
 			} 
-		case message := <-h.Broadcast: 
+			case message := <-h.Broadcast: 
 			//check the the exist or not
 			if _ , ok :=  h.Rooms[message.RoomID] ; ok{
 				//sending the message to all the client in the room
 				for _ , client := range h.Rooms[message.RoomID].Clients{
-					
-					client.Message<- message
-					
+					// create a message copy for each client
+					clientMessage := message
+					client.Message <- clientMessage
 				}
 			}
 		}

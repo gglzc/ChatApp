@@ -1,7 +1,6 @@
 package db
 
 import (
-	"context"
 	"github.com/go-redis/redis/v9"
 )
 
@@ -10,14 +9,6 @@ type Redisdb struct {
 }
 
 // Get implements user.ChacheTx
-func (*Redisdb) Get(ctx context.Context, key string) (*redis.ScanCmd, error) {
-	panic("unimplemented")
-}
-
-// Set implements user.ChacheTx
-func (*Redisdb) Set(ctx context.Context, key string, value string) (*redis.ScanCmd, error) {
-	panic("unimplemented")
-}
 
 func NewCache() *Redisdb {
 	rdb := redis.NewClient(&redis.Options{

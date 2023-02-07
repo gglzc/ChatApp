@@ -61,12 +61,12 @@ func (h *Handler) JoinRoom (c *gin.Context){
 	}
 
 	roomID := c.Param("roomId")
-	clientID := c.Query("userid")
+	clientID := c.Query("userId")
 	username := c.Query("username")
 
 	client:=&Client{
 		Conn:     conn,
-		Message:  make(chan *Message, 10),
+		Message:  make(chan *Message),
 		ID:       clientID,
 		RoomID:   roomID,
 		Username: username,
@@ -74,7 +74,6 @@ func (h *Handler) JoinRoom (c *gin.Context){
 
 	message:=&Message{
 		Content: "A new User Come the room",
-		ID: client.ID,
 		RoomID: client.RoomID,
 		Username: client.Username,
 	}
@@ -85,7 +84,7 @@ func (h *Handler) JoinRoom (c *gin.Context){
 	//writeMessage()
 	go client.writeMessage()
 	//readMessage()
-	 client.readMessage(h.hub)
+	go client.readMessage(h.hub)
 }
 
 type RoomRes  struct{
