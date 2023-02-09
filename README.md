@@ -6,26 +6,26 @@
 > Makefile
 
 ## Frontend:
-   >  __React__  
-   >  __Typescript__ 
-   > __Next__
-
+   ### React,
+   ### Typescript, 
+   ### Next
+___
 ## Backend :
- >   Language:
- >>  __Go v1.18.4__
-    >> Framework:Gin
- > __JWT__
- > __Gorilla__ 
-
+ ### Language:
+ ### Go v1.18.4
+    Gin
+    JWT (for Login)
+    Gorilla (for websocket)
+ ___
 ## Databse:
- >  Postgres
- >> migration
+### Postgres
+    migration
 
 
 ___
 # Architecture
-![arch] (./util/archit.jpg)
-![hub]  (./util/hub.jpg)
+![arch](util/archit.jpg)
+![hub](util/hub.jpg)
 ___
 # Undone
 Cache
