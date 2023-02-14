@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gglzc/StreamingWeb/db"
+	"github.com/gglzc/StreamingWeb/db/redis"
 	"github.com/gglzc/StreamingWeb/internal/user"
 	"github.com/gglzc/StreamingWeb/internal/ws"
 	"github.com/gglzc/StreamingWeb/router"
@@ -15,8 +16,9 @@ func main(){
 		log.Fatalf("can't connect db cause : %s" ,err)
 	}
 	
+	redisdbConn  := redis.NewCache()
 	
-	userRep := user.NewRepository(dbConn.GetDB())
+	userRep := user.NewRepository(dbConn.GetDB(),redisdbConn.GetChache())
 	userSvc := user.NewService(userRep)
 	userHandler := user.NewHandler(userSvc)
 

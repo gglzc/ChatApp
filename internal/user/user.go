@@ -37,12 +37,11 @@ type Repository interface{
 	GetUserByEmail(ctx context.Context , email string) (*User , error)
 	CheckUsernameExist(ctx context.Context , username string) (bool,error)
 	CheckEmailExist(ctx context.Context , email string) (bool,error)
+	
+	CheckEmailByCache(ctx context.Context ,key string) (bool, error)
+	CheckUsernameByCache(ctx context.Context ,key string) (bool,error)
 }
 
-type  CacheRepository interface{
-	ChacheGet(ctx context.Context ,key string) (interface{}, error)
-	ChacheSet(ctx context.Context ,key string, value interface{}) error
-}
 
 type Service interface{
 	CreateUser(ctx context.Context ,req *CreateUserReq)(*CreateUserRes , error)

@@ -1,4 +1,4 @@
-package db
+package redis
 
 import (
 	"github.com/go-redis/redis/v9"
@@ -23,6 +23,6 @@ func (rdb *Redisdb) Close() {
 	rdb.redisdb.Close()
 }
 
-func (rdb *Redisdb) GetChache() *Redisdb {
-	return rdb
+func (rdb *Redisdb) GetChache() *redis.Client {
+	return rdb.redisdb
 }

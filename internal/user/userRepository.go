@@ -14,8 +14,7 @@ type DBTX interface{
 }
 
 type ChacheTx interface{
-    Get(ctx context.Context, key string) (*redis.MapStringIntCmd , error)
-    Set(ctx context.Context, key string, value string) (*redis.Cmder , error)
+    Get(ctx context.Context, key string) (*redis.StringCmd)
 }
 
 type repository struct{
@@ -23,17 +22,16 @@ type repository struct{
 	redisdb	ChacheTx
 }
 
-func NewRepository(db DBTX ) Repository{
+func NewRepository(db DBTX ,redisdb ChacheTx) Repository{
 	return &repository{
 		db:      db,
-	
+		redisdb: redisdb,
 	}
 }
 
 func (r *repository) CreateUser(ctx context.Context,user *User)(*User , error ){
 	var lastInsertID int
-	//先到快取尋找有沒有存在
-	//放入db前先檢查完畢確認沒有,插入資料庫
+
 	query := "INSERT INTO public.user(username, password, email) VALUES ($1, $2, $3) returning id"
 	err := r.db.QueryRowContext(ctx , query, user.Username,user.Password,user.Email).Scan(&lastInsertID)
 	if err!=nil{
@@ -87,14 +85,21 @@ func (r *repository)CheckEmailExist(ctx context.Context , email string)(bool,err
 	return true,nil
 }
 
-/*
-func (r *repository)ChacheGet(ctx context.Context, token string) (*redis.Cmd ,error){
-	getuser,err:=r.redisdb.Get(ctx , token)
+
+func (r *repository)CheckEmailByCache(ctx context.Context, email string) (bool,error){
+	key:=r.redisdb.Get(ctx , email)
+	emailExist , err := key.Bool()
 	if err!=nil{
-		return nil,err
+		return false , err
 	}
-
-	return getuser , nil
-
+	return emailExist ,err
 }
-*/
+
+func (r *repository)CheckUsernameByCache(ctx context.Context ,username string) (bool,error){
+	key:=r.redisdb.Get(ctx , username )
+	usernameExist , err := key.Bool()
+	if err!=nil{
+		return false , err
+	}
+	return usernameExist,err
+}

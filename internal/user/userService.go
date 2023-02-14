@@ -24,6 +24,7 @@ type MyJWTclaims struct{
 	Username	string		`json:"username"`
 	jwt.RegisteredClaims
 }
+
 func NewService(repository Repository)Service{
 	return &service{
 		repository,
@@ -34,6 +35,10 @@ func NewService(repository Repository)Service{
 func (s *service) CreateUser (ctx context.Context ,req *CreateUserReq)(*CreateUserRes , error){
 	ctx,cancel:=context.WithTimeout(ctx,s.timeout)
 	defer cancel()
+	//check cache first
+	if err:=s.CheckEmailAndUsernameExistCache(ctx,req.Email,req.Username); err!=nil{
+		return nil,err
+	}
 	//check username and email exist or not
 	if err := s.CheckUsernameAndEmailExist(ctx, req.Username, req.Email); err != nil {
 		return nil, err
@@ -99,7 +104,9 @@ func (s *service) Login(c context.Context,req *LoginUserReq) (*LoginUserRes , er
 }
 
 func (s *service) CheckUsernameAndEmailExist(ctx context.Context, username, email string) error {
-    //check username is exist or not
+    ctx,cancel:=context.WithTimeout(ctx,s.timeout)
+	defer cancel()
+	//check username is exist or not
     checkUsernameExist, err := s.Repository.CheckUsernameExist(ctx, username)
     if err != nil {
         return err
@@ -120,6 +127,26 @@ func (s *service) CheckUsernameAndEmailExist(ctx context.Context, username, emai
     return nil
 }
 
-func (s *service) GetChache(ctx context.Context , jwt string) error {
+func (s *service)CheckEmailAndUsernameExistCache(ctx context.Context , username , email string)error{
+	
+	ctx,cancel:=context.WithTimeout(ctx,s.timeout)
+	defer cancel()
+	
+	checkEmailExist,err :=s.CheckEmailByCache(ctx ,email)
+	if err!=nil{
+		return err
+	}
+	if !checkEmailExist{
+		return fmt.Errorf("email does exist")
+	}
+
+	checkUsernameExist,err :=s.CheckUsernameByCache(ctx,username)
+	if err!=nil{
+		return err
+	}
+	if !checkUsernameExist{
+		return fmt.Errorf("username does exist")
+	}
+
 	return nil
 }
