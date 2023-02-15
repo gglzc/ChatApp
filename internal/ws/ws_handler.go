@@ -23,7 +23,12 @@ func NewHandler (h *Hub) *Handler{
 	}
 }
 
-
+// @Summary 創建房間
+// @Tags Room API
+// @Router /ws/createroom [post]
+// @Param id query string true "房間ID"
+// @Param name query string true "房間名稱"
+// @Success 200 {string} string "創建成功"
 func (h *Handler) CreateRoom (c *gin.Context){
 	var  req  CreateRoomReq
 	if err:=c.ShouldBind(&req) ; err!=nil{
@@ -53,6 +58,13 @@ var upgrader = websocket.Upgrader{
 	EnableCompression: false,
 }
 
+// @Summary 加入房間
+// @Tags Room API
+// @Router /ws/joinRoom/{roomId} [get]
+// @Param id query string true "用户 ID"
+// @Param roomId path string true "房間 ID"
+// @Param username query string true "用户名"
+// @Success 200 {string} string "成功"
 func (h *Handler) JoinRoom (c *gin.Context){
 	conn,err:=upgrader.Upgrade(c.Writer , c.Request ,nil)
 	if err!=nil {
@@ -92,6 +104,10 @@ type RoomRes  struct{
 	Name	    string	`json:"name"`
 }
 
+// @Summary 列出所有房間
+// @Tags Room API
+// @Router /ws/getRooms [get]
+// @Success 200 {object} []RoomRes "成功"
 func (h *Handler) GetRooms (c *gin.Context){
 	rooms:=make([]RoomRes , 0)
 
@@ -108,6 +124,11 @@ type ClientRes struct{
 	ID				string	`json:"id"`
 	UserName	    string	`json:"username"`
 }
+// @Summary 列出房間中所有user
+// @Tags Room API
+// @Router /ws/getClients/{roomId} [get]
+// @Param roomId path string true "房間 ID"
+// @Success 200 {object} []ClientRes "成功"
 func (h *Handler) GetRoomsClients(c *gin.Context){
 	var clients []ClientRes
 	roomId:=c.Param("roomId")

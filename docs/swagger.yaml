@@ -1,0 +1,188 @@
+definitions:
+  user.LoginUserRes:
+    properties:
+      id:
+        type: string
+      username:
+        type: string
+    type: object
+  ws.ClientRes:
+    properties:
+      id:
+        type: string
+      username:
+        type: string
+    type: object
+  ws.RoomRes:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost:8085
+info:
+  contact:
+    name: gglzc
+  description: Gin swagger
+  title: OMA CHAT API
+  version: "2.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User's email address
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: User's password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.LoginUserRes'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: 登入會員
+      tags:
+      - Login
+  /logout:
+    get:
+      responses:
+        "200":
+          description: Logout successful
+          schema:
+            type: string
+      summary: 登出會員
+      tags:
+      - Logout
+  /signup:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Username
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: 申請會員
+      tags:
+      - Signup
+  /ws/createroom:
+    post:
+      parameters:
+      - description: 房間ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: 房間名稱
+        in: query
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: 創建成功
+          schema:
+            type: string
+      summary: 創建房間
+      tags:
+      - Room API
+  /ws/getClients/{roomId}:
+    get:
+      parameters:
+      - description: 房間 ID
+        in: path
+        name: roomId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: 成功
+          schema:
+            items:
+              $ref: '#/definitions/ws.ClientRes'
+            type: array
+      summary: 列出房間中所有user
+      tags:
+      - Room API
+  /ws/getRooms:
+    get:
+      responses:
+        "200":
+          description: 成功
+          schema:
+            items:
+              $ref: '#/definitions/ws.RoomRes'
+            type: array
+      summary: 列出所有房間
+      tags:
+      - Room API
+  /ws/joinRoom/{roomId}:
+    get:
+      parameters:
+      - description: 用户 ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: 房間 ID
+        in: path
+        name: roomId
+        required: true
+        type: string
+      - description: 用户名
+        in: query
+        name: username
+        required: true
+        type: string
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+      summary: 加入房間
+      tags:
+      - Room API
+swagger: "2.0"

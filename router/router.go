@@ -9,6 +9,9 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/zap"
 	"go.uber.org/zap"
+    swaggerFiles "github.com/swaggo/files"
+    ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/gglzc/StreamingWeb/docs"
 )
 
 var r *gin.Engine
@@ -30,7 +33,11 @@ func InitRouter(userHandler *user.Handler , wsHandler *ws.Handler){
 		},
 		MaxAge: 12 * time.Hour,
 	  }))
-	
+	//swagger
+	url := ginSwagger.URL("http://localhost:8085/swagger/doc.json") // The url pointing to API definition
+    r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+
+	//router
 	r.POST("/signup" ,userHandler.CreateUser)
 	r.POST("/login",userHandler.Login)
 	r.GET("/logout",userHandler.LogOut)

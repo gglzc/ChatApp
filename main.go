@@ -3,13 +3,19 @@ package main
 import (
 	"log"
 
+	_"github.com/gglzc/StreamingWeb/docs"
 	"github.com/gglzc/StreamingWeb/db"
 	"github.com/gglzc/StreamingWeb/db/redis"
 	"github.com/gglzc/StreamingWeb/internal/user"
 	"github.com/gglzc/StreamingWeb/internal/ws"
 	"github.com/gglzc/StreamingWeb/router"
 )
-
+// @title OMA CHAT API
+// @version 2.0
+// @description Gin swagger
+// @contact.name gglzc
+// @host localhost:8085
+// schemes http
 func main(){
 	dbConn,err:=db.NewDatebase()
 	if err!=nil{
