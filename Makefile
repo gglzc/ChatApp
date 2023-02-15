@@ -19,4 +19,10 @@ migrateup:
 migratedown:
 	migrate -path db/migrations -database "postgres://root:test@localhost:5430/go-chat?sslmode=disable" --verbose down
 
-.PHONY: postgresInit postgres createdb dropdb migrateup migratedown
+dockerup:
+	docker-compose	up
+
+dockerdown:
+	docker-compose down
+
+.PHONY: postgresInit postgres createdb dropdb migrateup migratedown up

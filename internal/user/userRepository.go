@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/go-redis/redis/v9"
 )
@@ -15,6 +16,10 @@ type DBTX interface{
 
 type ChacheTx interface{
     Get(ctx context.Context, key string) (*redis.StringCmd)
+	Set(ctx context.Context,key string, value interface{}, expiration time.Duration) *redis.StatusCmd
+	Exists(ctx context.Context,key ...string) (*redis.IntCmd)
+	SAdd(ctx context.Context,key string,member ...interface{})*redis.IntCmd
+	SIsMember(ctx context.Context,key string,member interface{})*redis.BoolCmd
 }
 
 type repository struct{
@@ -87,19 +92,32 @@ func (r *repository)CheckEmailExist(ctx context.Context , email string)(bool,err
 
 
 func (r *repository)CheckEmailByCache(ctx context.Context, email string) (bool,error){
-	key:=r.redisdb.Get(ctx , email)
-	emailExist , err := key.Bool()
+	exist,err:=r.redisdb.SIsMember(ctx,"email",email).Result()
 	if err!=nil{
-		return false , err
+		return false,err
 	}
-	return emailExist ,err
+	return exist,nil
 }
 
 func (r *repository)CheckUsernameByCache(ctx context.Context ,username string) (bool,error){
-	key:=r.redisdb.Get(ctx , username )
-	usernameExist , err := key.Bool()
+	exist,err:=r.redisdb.SIsMember(ctx,"username",username).Result()
 	if err!=nil{
-		return false , err
+		return false,err
 	}
-	return usernameExist,err
+	return exist,nil
+}
+
+func (r *repository)CreateUserByCache(ctx context.Context, user *User) error{
+	//username
+	_,err:=r.redisdb.SAdd(ctx,"username",user.Username).Result()
+	if err!=nil{
+		return err
+	}
+	//email
+	_, err = r.redisdb.SAdd(ctx, "email", user.Email).Result()
+    if err != nil {
+        return err
+    }
+
+    return nil
 }

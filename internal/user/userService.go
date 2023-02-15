@@ -8,6 +8,7 @@ import (
 
 	"github.com/gglzc/StreamingWeb/util"
 	"github.com/golang-jwt/jwt/v4"
+	
 )
 
 const(
@@ -36,7 +37,7 @@ func (s *service) CreateUser (ctx context.Context ,req *CreateUserReq)(*CreateUs
 	ctx,cancel:=context.WithTimeout(ctx,s.timeout)
 	defer cancel()
 	//check cache first
-	if err:=s.CheckEmailAndUsernameExistCache(ctx,req.Email,req.Username); err!=nil{
+	if err:=s.CheckEmailAndUsernameExistCache(ctx,req.Username,req.Email); err!=nil{
 		return nil,err
 	}
 	//check username and email exist or not
@@ -54,11 +55,19 @@ func (s *service) CreateUser (ctx context.Context ,req *CreateUserReq)(*CreateUs
 		Email: 	  req.Email,
 		Password: hashedPassword,
 	}
-
+	//write into db
 	r , err:=s.Repository.CreateUser(ctx,u)
 	if err!=nil{
 		return nil,err
 	}
+	//write back to cache
+	if err := s.Repository.CreateUserByCache(ctx,&User{
+		Username: req.Username,
+		Email: req.Email,
+	});err!=nil{
+		return nil,err
+	}
+
 
 	res:=&CreateUserRes{
 		ID:			strconv.Itoa(int(r.ID)),
@@ -136,7 +145,7 @@ func (s *service)CheckEmailAndUsernameExistCache(ctx context.Context , username 
 	if err!=nil{
 		return err
 	}
-	if !checkEmailExist{
+	if checkEmailExist{
 		return fmt.Errorf("email does exist")
 	}
 
@@ -144,7 +153,7 @@ func (s *service)CheckEmailAndUsernameExistCache(ctx context.Context , username 
 	if err!=nil{
 		return err
 	}
-	if !checkUsernameExist{
+	if checkUsernameExist{
 		return fmt.Errorf("username does exist")
 	}
 

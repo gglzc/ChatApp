@@ -40,6 +40,7 @@ type Repository interface{
 	
 	CheckEmailByCache(ctx context.Context ,key string) (bool, error)
 	CheckUsernameByCache(ctx context.Context ,key string) (bool,error)
+	CreateUserByCache(ctx context.Context, user *User) error
 }
 
 

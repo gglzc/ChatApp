@@ -7,14 +7,18 @@ import (
 	"github.com/gglzc/StreamingWeb/internal/ws"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/zap"
+	"go.uber.org/zap"
 )
 
 var r *gin.Engine
 
 func InitRouter(userHandler *user.Handler , wsHandler *ws.Handler){
 	r = gin.Default()
-	
-	r.Use(gin.Logger())
+	//zaplogger
+	logger , _:= zap.NewProduction()
+	r.Use(ginzap.Ginzap(logger,time.RFC3339,true))
+	//Cors
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST"},

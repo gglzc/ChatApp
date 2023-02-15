@@ -1,5 +1,5 @@
 # Demo Video
-[DemoVideo] (https://youtu.be/ZI6p3XrCaNw)
+[DemoVideo](https://youtu.be/ZI6p3XrCaNw)
 
 # Technology Using:
 > Docker
@@ -13,19 +13,21 @@ ___
 ## Backend :
  ### Language:
  ### Go v1.18.4
-    Gin
-    JWT (for Login)
-    Gorilla (for websocket)
+   Framework:Gin
+   Logger:UberZap 
+   Login:jwt
+   Websocket:gorilla
  ___
 ## Databse:
 ### Postgres
     migration
-
+### Cache:
+   Redis
 
 ___
 # Architecture
-![arch](util/archit.jpg)
-![hub](util/hub.jpg)
+![arch](util/pic/archit.jpg)
+![hub](util/pic/hub.jpg)
 ___
 # Undone
 Cache
