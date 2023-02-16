@@ -10,6 +10,7 @@ Job           | Using
 ------------- | -------------
 Framework     | React
 Language      | Typescript
+UI            | Tailwind
 ___
 ## Backend :
  ### Go v1.18.4
