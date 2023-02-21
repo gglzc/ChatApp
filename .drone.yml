@@ -1,0 +1,11 @@
+kind: pipeline
+name: OmaChat
+
+step:
+  - name: test
+    image: golang
+    commands: 
+    - go test
+  
+step:
+  -name: 

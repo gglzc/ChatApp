@@ -40,7 +40,7 @@ func (s *service) CreateUser (ctx context.Context ,req *CreateUserReq)(*CreateUs
 	if err:=s.CheckEmailAndUsernameExistCache(ctx,req.Username,req.Email); err!=nil{
 		return nil,err
 	}
-	//check username and email exist or not
+	//If cahce miss or check username and email exist in db
 	if err := s.CheckUsernameAndEmailExist(ctx, req.Username, req.Email); err != nil {
 		return nil, err
 	}

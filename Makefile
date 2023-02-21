@@ -25,4 +25,10 @@ dockerup:
 dockerdown:
 	docker-compose down
 
-.PHONY: postgresInit postgres createdb dropdb migrateup migratedown up
+build:
+	docker build -t omachat .
+
+omachat:
+	docker run  --name  omatest -d  omachat
+
+.PHONY: postgresInit postgres createdb dropdb migrateup migratedown build
