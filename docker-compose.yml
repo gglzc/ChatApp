@@ -1,47 +1,43 @@
-version: '3.8'
+version: '3.9'
 services:
   cache:
-    image: redis:latest
+    image: redis:alpine
     restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
     ports:
       - '6379:6379'
     volumes: 
-      - cache:/data
-volumes:
-  cache:
-    driver: local
-
-
-  drone-server:
-    image: drone/drone:1
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - backend
+  postgres:
+    image: postgres:12-alpine
+    environment:
+    - POSTGRES_USER=root
+    - POSTGRES_PASSWORD=test
+    - POSTGRES_DB=go-chat
+    networks:
+      - backend 
+  omachat-api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
-      - 8081:80
-    volumes:
-      - ./:/data
-    restart: always
+      - "8085:8085"
     environment:
-      - DRONE_SERVER_HOST=${DRONE_SERVER_HOST}
-      - DRONE_SERVER_PROTO=${DRONE_SERVER_PROTO}
-      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET}
-
-      # GitHub Config
-      - DRONE_GITHUB_SERVER=https://github.com
-      - DRONE_GITHUB_CLIENT_ID=${DRONE_GITHUB_CLIENT_ID}
-      - DRONE_GITHUB_CLIENT_SECRET=${DRONE_GITHUB_CLIENT_SECRET}
-
-      - DRONE_LOGS_PRETTY=true
-      - DRONE_LOGS_COLOR=true
-
-  # runner for docker version
-  drone-runner:
-    image: drone/drone-runner-docker:1
-    restart: always
+      - DB_SOURCE=postgresql://root:test@postgres:5430/go-chat?sslmode=disable
+      - CACHE_SOURCE=redis:6379
     depends_on:
-      - drone-server
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - DRONE_RPC_HOST=${DRONE_RPC_HOST}
-      - DRONE_RPC_PROTO=${DRONE_RPC_PROTO}
-      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET}
-      - DRONE_RUNNER_CAPACITY=3
+      - postgres
+      - cache
+    networks:
+      - backend
+networks:
+  backend:
+
+
+
+
+  

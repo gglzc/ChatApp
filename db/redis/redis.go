@@ -20,7 +20,8 @@ func init(){
 // 設置Viper
 	viper.SetConfigName("config") // 文件名稱
 	viper.SetConfigType("yaml") // 文件類型
-	viper.AddConfigPath("/app/config") // 搜索的路徑，此處為當前目錄
+	viper.AddConfigPath("./config") // 搜索的路徑，此處為當前目錄
+	
 
 // 讀取配置文件
 	err := viper.ReadInConfig()

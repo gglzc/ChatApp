@@ -1,11 +1,42 @@
 kind: pipeline
-name: OmaChat
+type: kubernetes
+name: default
 
-step:
-  - name: test
-    image: golang
-    commands: 
-    - go test
-  
-step:
-  -name: 
+steps:
+- name: test
+  image: golang:1.18.4-alpine
+  commands:
+  - apk add --no-cache git
+  - cd ./internal/user && go test -v
+    when:
+      branch:
+        - main
+
+- name: publish
+  image: plugins/docker
+  settings:
+    repo: your-repo/go
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    tags:
+      - 1.18.4
+  when:
+    event:
+    - tag
+    branch:
+    - main
+
+- name: deploy
+  image: plugins/kubernetes
+  settings:
+    config_file: kubeconfig.yaml
+    namespace: default
+    deployment: your-deployment
+    image: your-repo/go:1.18.4
+  when:
+    event:
+    - push
+    branch:
+    - main

@@ -29,6 +29,6 @@ build:
 	docker build -t omachat .
 
 omachat:
-	docker run  --name  omatest -d  omachat
+	docker run  --name  omatest  -p 8085:8085 -d  omachat
 
-.PHONY: postgresInit postgres createdb dropdb migrateup migratedown build
+.PHONY: postgresInit postgres createdb dropdb migrateup migratedown build 
